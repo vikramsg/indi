@@ -12,5 +12,5 @@ install:
 	poetry install --no-root
 	poetry shell
 
-task2: 
-	python -m src.task2 --file-name=data/commission_dataset.csv
+filetree_metadata_extraction: 
+	python -m src.main

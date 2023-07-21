@@ -31,13 +31,7 @@ Invoke static checks using
 make check
 ```
 
-Tests will come in the future.
 
 
 ## Run
 
-Run a city using
-
-```
-make city_journeys CITY=Hamburg 
-```
