@@ -22,8 +22,17 @@ class ObjectKey(BaseModel):
     object_key: str
 
     @validator("object_key")
-    def validate_object_key(cls, object_key: str) -> str:
-        if not object_key.endswith(".fastq.gz"):
+    def validate_object_key(cls, value: str) -> str:
+        if not value.endswith(".fastq.gz"):
             raise ValueError("Invalid object key. Should end with .fastq.gz")
 
-        return object_key
+        if value.count("/") != 2:
+            raise ValueError("Invalid object key. Must contain 2 /")
+
+        if value.count("-") != 3:
+            raise ValueError("Invalid object key. Must contain 3 -")
+
+        if value.count("_") != 6:
+            raise ValueError("Invalid object key. Must contain 6 _")
+
+        return value

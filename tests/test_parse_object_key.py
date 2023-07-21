@@ -22,12 +22,27 @@ def test_object_key_valid(object_key_str: str) -> None:
 
 
 @pytest.mark.parametrize(
-    "object_key_str",
+    "object_key_str, expected_err_msg",
     [
-        ("X123-Tn13/wgs/XXBRCDXXX_DNA_X123-Ts13_GAAGGAAG-ATGACGTC_L001_R1_001"),
+        (
+            "X123-Tn13/wgs/XXBRCDXXX_DNA_X123-Ts13_GAAGGAAG-ATGACGTC_L001_R1_001",
+            "Invalid object key. Should end with .fastq.gz",
+        ),
+        (
+            "X123-Tn13wgs/XXBRCDXXX_DNA_X123-Ts13_GAAGGAAG-ATGACGTC_L001_R1_001.fastq.gz",
+            "Invalid object key. Must contain 2 /",
+        ),
+        (
+            "X123Tn13/wgs/XXBRCDXXX_DNA_X123-Ts13_GAAGGAAG-ATGACGTC_L001_R1_001.fastq.gz",
+            "Invalid object key. Must contain 3 -",
+        ),
+        (
+            "X123-Tn13/wgs/XXBRCDXXX_DNA_X123-Ts13GAAGGAAG-ATGACGTC_L001_R1_001.fastq.gz",
+            "Invalid object key. Must contain 6 _",
+        ),
     ],
 )
-def test_object_key_invalid(object_key_str: str) -> None:
+def test_object_key_invalid(object_key_str: str, expected_err_msg: str) -> None:
     # Given
 
     # When
@@ -35,7 +50,4 @@ def test_object_key_invalid(object_key_str: str) -> None:
         _ = parse_object_key(object_key_str)
 
     # Then
-    assert any(
-        "Invalid object key. Should end with .fastq.gz" in error["msg"]
-        for error in err.value.errors()
-    )
+    assert any(expected_err_msg in error["msg"] for error in err.value.errors())
