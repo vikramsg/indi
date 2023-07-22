@@ -19,7 +19,7 @@ class ExtractFileTreeMetadata:
         unique_object_keys: Dict[str, int] = {}
 
         for it, object_key in enumerate(object_keys):
-            if object_key in unique_object_keys.keys():
+            if object_key in unique_object_keys:
                 logger.error(
                     f"Object key {object_key} found on line {it} already exists on line unique_object_keys[object_key]."
                     "Skipping."

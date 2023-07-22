@@ -117,7 +117,6 @@ def test_object_key_invalid_metadata(object_key_str: str) -> None:
 def test_extract_filetree_metadata(
     filetree_input_json: str, filetree_expected_output_json: str
 ) -> None:
-    pass
     # Given
     input_object_keys = json.loads(filetree_input_json)
     expected_output_metadata = json.loads(filetree_expected_output_json)
@@ -131,6 +130,44 @@ def test_extract_filetree_metadata(
 
     # Then
     assert expected_output_metadata == output_metadata
+
+
+def test_extract_filetree_metadata_from_identical_keys() -> None:
+    # Given
+    input_object_keys = json.loads(
+        json.dumps(
+            [
+                "Y512-Tc7/wgs/HWW7GDSXX_DNA_Y512-Tc7_TGAAGACG-TGGCATGA_L002_R1_001.fastq.gz",
+                "Y512-Tc7/wgs/HWW7GDSXX_DNA_Y512-Tc7_TGAAGACG-TGGCATGA_L002_R1_001.fastq.gz",
+            ]
+        )
+    )
+
+    metadata_extractor = ExtractFileTreeMetadata()
+    metadata_extractor.read_json(input_object_keys)
+
+    # When
+    metadata_extractor.extract_filetree_metadata()
+    output_metadata = metadata_extractor.get_filetree_metadata()
+
+    # Then
+    assert output_metadata == [
+        {
+            "case-id": "Y512",
+            "sample-label": "Tc7",
+            "sample-id": "Y512-Tc7",
+            "data-type": "wgs",
+            "lanes": [
+                {
+                    "path": "Y512-Tc7/wgs/HWW7GDSXX_DNA_Y512-Tc7_TGAAGACG-TGGCATGA_L002_R1_001.fastq.gz",
+                    "lane": 2,
+                    "marker-forward": "TGAAGACG",
+                    "marker-reverse": "TGGCATGA",
+                    "barcode": "HWW7GDSXX",
+                },
+            ],
+        },
+    ]
 
 
 @pytest.fixture

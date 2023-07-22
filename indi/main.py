@@ -48,7 +48,7 @@ def main(input_file: str, output_file: str) -> None:
 
     logger.info("Write Filetree Metadata to output file.")
     with open(output_file, "w") as fp:
-        json.dump(output_metadata, fp)
+        json.dump(output_metadata, fp, indent=4)
 
 
 if __name__ == "__main__":
