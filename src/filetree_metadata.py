@@ -1,15 +1,13 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from src.model import FileTreeMetadata, Metadata, ObjectKey
 
 
 class ExtractFileTreeMetadata:
     def __init__(self) -> None:
-        self.object_keys = None
+        self.object_keys: List[ObjectKey] = []
 
         self.sample_id_to_metadata: Dict[str, Metadata] = {}
-
-        self.filetree_metadata = None
 
     def read_json(self, object_keys: Dict[str, Any]) -> None:
         if len(object_keys) == 0:
@@ -32,7 +30,7 @@ class ExtractFileTreeMetadata:
                     object_key_metadata.lanes
                 )
 
-    def get_filetree_metadata(self) -> Dict[str, Any]:
+    def get_filetree_metadata(self) -> Any:
         return FileTreeMetadata(
             filetree_metadata=list(self.sample_id_to_metadata.values())
         ).model_dump(by_alias=True)["filetree_metadata"]
