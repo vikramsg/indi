@@ -137,7 +137,7 @@ files = [
 name = "isort"
 version = "5.12.0"
 description = "A Python utility / library to sort Python imports."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.8.0"
 files = [
@@ -520,4 +520,4 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.1,<3.11"
-content-hash = "1428cdae2baa2f136a383382284202a69d156bf0f3dba22ed75617f2eba12563"
+content-hash = "63c6fcdeae06fc5d699fbe9e9ef371a66ce307732eda7db9c0cb0bcc6608275d"

@@ -4,7 +4,7 @@ from pathlib import Path
 import click
 from loguru import logger
 
-from src.filetree_metadata import ExtractFileTreeMetadata
+from indi.filetree_metadata import ExtractFileTreeMetadata
 
 
 @click.command()

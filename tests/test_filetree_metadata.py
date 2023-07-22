@@ -3,8 +3,8 @@ import json
 import pytest
 from pydantic import ValidationError
 
-from src.filetree_metadata import ExtractFileTreeMetadata
-from src.model import Lane, Metadata, ObjectKey
+from indi.filetree_metadata import ExtractFileTreeMetadata
+from indi.model import Lane, Metadata, ObjectKey
 
 
 @pytest.mark.parametrize(

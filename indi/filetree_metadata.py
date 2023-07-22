@@ -1,6 +1,6 @@
 from typing import Any, Dict, List
 
-from src.model import FileTreeMetadata, Metadata, ObjectKey
+from indi.model import FileTreeMetadata, Metadata, ObjectKey
 
 
 class ExtractFileTreeMetadata:
