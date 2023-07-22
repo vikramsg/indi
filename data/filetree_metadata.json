@@ -289,13 +289,6 @@
                 "marker-forward": "ACTGAGGT",
                 "marker-reverse": "CTGTTGAC",
                 "barcode": "HYKKLDSXX"
-            },
-            {
-                "path": "Y466-Tn14/wgs/HYKKLDSXX_DNA_Y466-Tn14_ACTGAGGT-CTGTTGAC_L004_R1_001.fastq.gz",
-                "lane": 4,
-                "marker-forward": "ACTGAGGT",
-                "marker-reverse": "CTGTTGAC",
-                "barcode": "HYKKLDSXX"
             }
         ]
     },
@@ -450,13 +443,6 @@
             {
                 "path": "X550-Tc8/wgs/HWYLNDSXX_DNA_X550-Tc8_GAGCAGTA-ACAGCTCA_L003_R1_001.fastq.gz",
                 "lane": 3,
-                "marker-forward": "GAGCAGTA",
-                "marker-reverse": "ACAGCTCA",
-                "barcode": "HWYLNDSXX"
-            },
-            {
-                "path": "X550-Tc8/wgs/HWYLNDSXX_DNA_X550-Tc8_GAGCAGTA-ACAGCTCA_L004_R1_001.fastq.gz",
-                "lane": 4,
                 "marker-forward": "GAGCAGTA",
                 "marker-reverse": "ACAGCTCA",
                 "barcode": "HWYLNDSXX"

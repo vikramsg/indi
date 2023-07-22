@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from loguru import logger
 from pydantic import ValidationError
@@ -16,26 +16,40 @@ class ExtractFileTreeMetadata:
         if len(object_keys) == 0:
             raise ValueError("Empty list")
 
-        unique_object_keys: Dict[str, int] = {}
+        for object_key in object_keys:
+            self.object_keys.append(ObjectKey(object_key=object_key))
 
-        for it, object_key in enumerate(object_keys):
-            if object_key in unique_object_keys:
+    def _unique_object_keys(self) -> List[ObjectKey]:
+        unique_object_keys = []
+        object_key_dict: Dict[str, int] = {}
+        for it, object_key in enumerate(self.object_keys):
+            if object_key.object_key in object_key_dict:
                 logger.error(
-                    f"Object key {object_key} found on line {it} already exists on line unique_object_keys[object_key]."
+                    f"Object key {object_key.object_key} found on line {it} "
+                    f"already exists on line {object_key_dict[object_key.object_key]}."
                     "Skipping."
                 )
             else:
-                unique_object_keys[object_key] = it
-                self.object_keys.append(ObjectKey(object_key=object_key))
+                object_key_dict[object_key.object_key] = it
+                unique_object_keys.append(object_key)
+
+        return unique_object_keys
+
+    def _parse_object_key(self, object_key: ObjectKey) -> Optional[Metadata]:
+        try:
+            return Metadata.parse_object_key(object_key)
+        except ValidationError as err:
+            logger.error(
+                f"Error for object key: {object_key}. Error: {err}.\nSkipping."
+            )
+            return None
 
     def extract_filetree_metadata(self) -> None:
-        for object_key in self.object_keys:
-            try:
-                object_key_metadata = Metadata.parse_object_key(object_key)
-            except ValidationError as err:
-                logger.error(
-                    f"Error for object key: {object_key}. Error: {err}. Skipping."
-                )
+        object_keys = self._unique_object_keys()
+        for object_key in object_keys:
+            object_key_metadata = self._parse_object_key(object_key)
+            if not object_key_metadata:
+                continue
 
             sample_id = object_key_metadata.sample_id
             if sample_id not in self.sample_id_to_metadata:
