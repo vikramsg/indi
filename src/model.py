@@ -1,6 +1,6 @@
 from typing import List
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, field_validator, model_validator
 
 
 def _snake_to_kebab(snake_str: str) -> str:
@@ -56,15 +56,15 @@ class Metadata(BaseModel):
             ],
         )
 
-    @validator("lanes")
-    def validate_path_matches_sample_id(cls, lanes, values):
-        if values["sample_id"] != lanes[0].path.split("/")[2].split("_")[2]:
+    @model_validator(mode="after")
+    def validate_path_matches_sample_id(self) -> "Metadata":
+        if self.sample_id != self.lanes[0].path.split("/")[2].split("_")[2]:
             raise ValueError(
                 """Invalid object key. The same sample id must be present at the beginning and in the middle,
                 that is, the path must be <sample_id/data_type/..._sample_id_....>"""
             )
 
-        return lanes
+        return self
 
     # JSON output will have kebab case
     class Config:
@@ -74,7 +74,7 @@ class Metadata(BaseModel):
 class ObjectKey(BaseModel):
     object_key: str
 
-    @validator("object_key")
+    @field_validator("object_key")
     def validate_object_key(cls, value: str) -> str:
         if not value.endswith(".fastq.gz"):
             raise ValueError("Invalid object key. Should end with .fastq.gz")
