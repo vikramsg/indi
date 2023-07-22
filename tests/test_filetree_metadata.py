@@ -1,13 +1,11 @@
 import json
 from typing import Any
+
 import pytest
 from pydantic import ValidationError
 
+from src.filetree_metadata import ExtractFileTreeMetadata
 from src.model import Lane, Metadata, ObjectKey
-from src.filetree_metadata import (
-    create_metadata_model_for_object_key,
-    extract_file_tree_metadata,
-)
 
 
 @pytest.mark.parametrize(
@@ -86,7 +84,7 @@ def test_object_key_valid_metadata(
     object_key = ObjectKey(object_key=object_key_str)
 
     # When
-    object_key_metadata = create_metadata_model_for_object_key(object_key)
+    object_key_metadata = Metadata.parse_object_key(object_key)
 
     # Then
     assert object_key_metadata == expected_metadata_model
@@ -107,7 +105,7 @@ def test_object_key_invalid_metadata(object_key_str: str) -> None:
 
     # When
     with pytest.raises(ValidationError) as err:
-        _ = create_metadata_model_for_object_key(object_key)
+        _ = Metadata.parse_object_key(object_key)
 
     # Then
     assert any(
@@ -125,11 +123,14 @@ def test_extract_filetree_metadata(
     input_object_keys = json.loads(filetree_input_json)
     expected_output_metadata = json.loads(filetree_expected_output_json)
 
+    metadata_extractor = ExtractFileTreeMetadata()
+    metadata_extractor.read_json(input_object_keys)
+
     # When
-    output_metadata = extract_file_tree_metadata(input_object_keys)
+    metadata_extractor.extract_filetree_metadata()
+    output_metadata = metadata_extractor.get_filetree_metadata()
 
     # Then
-
     assert expected_output_metadata == output_metadata
 
 
@@ -179,14 +180,14 @@ def filetree_expected_output_json() -> str:
                 "lanes": [
                     {
                         "path": "X121-Tn16/wgs/HYKKLDSXX_DNA_X121-Tn16_GTTGTTCG-GAAGTTGG_L001_R1_001.fastq.gz",
-                        "lane": 2,
+                        "lane": 1,
                         "marker-forward": "GTTGTTCG",
                         "marker-reverse": "GAAGTTGG",
                         "barcode": "HYKKLDSXX",
                     },
                     {
-                        "path": "X121-Tn16/wgs/HYKKLDSXX_DNA_X121-Tn16_GTTGTTCG-GAAGTTGG_L001_R1_001.fastq.gz",
-                        "lane": 1,
+                        "path": "X121-Tn16/wgs/HYKKLDSXX_DNA_X121-Tn16_GTTGTTCG-GAAGTTGG_L002_R1_001.fastq.gz",
+                        "lane": 2,
                         "marker-forward": "GTTGTTCG",
                         "marker-reverse": "GAAGTTGG",
                         "barcode": "HYKKLDSXX",
