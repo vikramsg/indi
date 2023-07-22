@@ -29,14 +29,14 @@ class Metadata(BaseModel):
     @classmethod
     def parse_object_key(cls, object_key: str) -> "Metadata":
         # ToDo: Rename
-        parts = object_key.split("/")
-        case_id, sample_label = parts[0].split("-")
-        data_type = parts[1]
+        slash_split_parts = object_key.split("/")
+        case_id, sample_label = slash_split_parts[0].split("-")
+        data_type = slash_split_parts[1]
 
-        other_parts = parts[2].split("_")
-        barcode = other_parts[0]
-        lane = int(other_parts[-3][1:])
-        marker_forward, marker_reverse = other_parts[3].split("-")
+        underscore_split_parts = slash_split_parts[2].split("_")
+        barcode = underscore_split_parts[0]
+        lane = int(underscore_split_parts[-3][1:])
+        marker_forward, marker_reverse = underscore_split_parts[3].split("-")
 
         path = object_key
 
@@ -56,7 +56,15 @@ class Metadata(BaseModel):
             ],
         )
 
-    # ToDo: Write validator for path and sample_id matching
+    @validator("lanes")
+    def validate_path_matches_sample_id(cls, lanes, values):
+        if values["sample_id"] != lanes[0].path.split("/")[2].split("_")[2]:
+            raise ValueError(
+                """Invalid object key. The same sample id must be present at the beginning and in the middle,
+                that is, the path must be <sample_id/data_type/..._sample_id_....>"""
+            )
+
+        return lanes
 
     # JSON output will have kebab case
     class Config:

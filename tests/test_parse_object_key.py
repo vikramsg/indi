@@ -89,3 +89,28 @@ def test_object_key_valid_metadata(
 
     # Then
     assert object_key_metadata == expected_metadata_model
+
+
+@pytest.mark.parametrize(
+    "object_key_str",
+    [
+        (
+            "X123-Tn12/wgs/XXBRCDXXX_DNA_X123-Tn13_GAAGGAAG-ATGACGTC_L001_R1_001.fastq.gz"
+        ),
+        ("X123-Tn13/wgs/XXBRCDXXX_DNA_X123-T13_GAAGGAAG-ATGACGTC_L001_R1_001.fastq.gz"),
+    ],
+)
+def test_object_key_invalid_metadata(object_key_str: str) -> None:
+    # Given
+    object_key = ObjectKey(object_key=object_key_str)
+
+    # When
+    with pytest.raises(ValidationError) as err:
+        _ = create_metadata_model_for_object_key(object_key)
+
+    # Then
+    assert any(
+        "Invalid object key. The same sample id must be present at the beginning and in the middle"
+        in error["msg"]
+        for error in err.value.errors()
+    )
