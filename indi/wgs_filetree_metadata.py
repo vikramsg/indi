@@ -8,11 +8,22 @@ from indi.model import WGSFileTreeMetadata, WGSMetadata, WGSObjectKey
 
 class ExtractWGSFileTreeMetadata:
     def __init__(self) -> None:
+        # List of all valid objects keys
         self.object_keys: List[WGSObjectKey] = []
 
+        # Dictionary to use for ensuring 1 sample_id has only 1 WGSMetadata object
         self.sample_id_to_metadata: Dict[str, WGSMetadata] = {}
 
     def read_json(self, object_keys: Any) -> None:
+        """Read in the list of object keys,
+        convert each to WGSObjectKey object for validation and store in a list
+
+        Args:
+            object_keys (Any): List of object keys
+
+        Raises:
+            ValueError: Raise error if the input is empty
+        """
         if len(object_keys) == 0:
             raise ValueError("Empty list")
 
@@ -35,7 +46,9 @@ class ExtractWGSFileTreeMetadata:
 
         return unique_object_keys
 
-    def _parse_object_key(self, object_key: WGSObjectKey) -> Optional[WGSMetadata]:
+    def _object_key_to_metadata(
+        self, object_key: WGSObjectKey
+    ) -> Optional[WGSMetadata]:
         try:
             return WGSMetadata.parse_object_key(object_key)
         except ValidationError as err:
@@ -45,9 +58,17 @@ class ExtractWGSFileTreeMetadata:
             return None
 
     def extract_wgs_filetree_metadata(self) -> None:
+        """
+        Create WGS metadata from the object keys.
+        First we make sure to use only unique keys.
+        Then, we convert object keys to metadata, and make sure it is valid
+        Then, for all metadata that already have sample_ids
+        we extract the lane and append it to the unique sample_id metadata
+        """
         object_keys = self._unique_object_keys()
+
         for object_key in object_keys:
-            object_key_metadata = self._parse_object_key(object_key)
+            object_key_metadata = self._object_key_to_metadata(object_key)
             if not object_key_metadata:
                 continue
 
@@ -60,6 +81,11 @@ class ExtractWGSFileTreeMetadata:
                 )
 
     def get_wgs_filetree_metadata(self) -> Any:
+        """Create json from the metadata ensuring correct names
+
+        Returns:
+            Any: json for the metadata
+        """
         return WGSFileTreeMetadata(
             filetree_metadata=list(self.sample_id_to_metadata.values())
         ).model_dump(by_alias=True)["filetree_metadata"]

@@ -43,6 +43,9 @@ class WGSMetadata(BaseModel):
 
     @classmethod
     def parse_object_key(cls, object_key: WGSObjectKey) -> "WGSMetadata":
+        """
+        Create Metadata for a single object key
+        """
         object_key_str = object_key.object_key
         slash_split_parts = object_key_str.split("/")
         case_id, sample_label = slash_split_parts[0].split("-")
