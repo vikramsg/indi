@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import List
 
 from pydantic import (
     BaseModel,
@@ -6,6 +6,29 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+
+
+class ObjectKey(BaseModel):
+    object_key: str
+
+    @field_validator("object_key")
+    def validate_object_key(cls, value: str) -> str:
+        if len(value) == 0:
+            raise ValueError("Invalid object key. Should not be empty.")
+
+        if not value.endswith(".fastq.gz"):
+            raise ValueError("Invalid object key. Should end with .fastq.gz")
+
+        if value.count("/") != 2:
+            raise ValueError("Invalid object key. Must contain 2 /")
+
+        if value.count("-") != 3:
+            raise ValueError("Invalid object key. Must contain 3 -")
+
+        if value.count("_") != 6:
+            raise ValueError("Invalid object key. Must contain 6 _")
+
+        return value
 
 
 class Lane(BaseModel):
@@ -24,8 +47,9 @@ class Metadata(BaseModel):
     lanes: List[Lane]
 
     @classmethod
-    def parse_object_key(cls, object_key: str) -> "Metadata":
-        slash_split_parts = object_key.split("/")
+    def parse_object_key(cls, object_key: ObjectKey) -> "Metadata":
+        object_key_str = object_key.object_key
+        slash_split_parts = object_key_str.split("/")
         case_id, sample_label = slash_split_parts[0].split("-")
         data_type = slash_split_parts[1]
 
@@ -34,7 +58,7 @@ class Metadata(BaseModel):
         lane = int(underscore_split_parts[-3][1:])
         marker_forward, marker_reverse = underscore_split_parts[3].split("-")
 
-        path = object_key
+        path = object_key_str
 
         return cls(
             case_id=case_id,
@@ -63,21 +87,5 @@ class Metadata(BaseModel):
         return self
 
 
-class ObjectKey(BaseModel):
-    object_key: str
-
-    @field_validator("object_key")
-    def validate_object_key(cls, value: str) -> str:
-        if not value.endswith(".fastq.gz"):
-            raise ValueError("Invalid object key. Should end with .fastq.gz")
-
-        if value.count("/") != 2:
-            raise ValueError("Invalid object key. Must contain 2 /")
-
-        if value.count("-") != 3:
-            raise ValueError("Invalid object key. Must contain 3 -")
-
-        if value.count("_") != 6:
-            raise ValueError("Invalid object key. Must contain 6 _")
-
-        return value
+class FileTreeMetadata(BaseModel):
+    filetree_metadata: List[Metadata]

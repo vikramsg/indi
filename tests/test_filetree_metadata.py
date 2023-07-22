@@ -1,8 +1,13 @@
+import json
+from typing import Any
 import pytest
 from pydantic import ValidationError
 
 from src.model import Lane, Metadata, ObjectKey
-from src.parse_object_key import create_metadata_model_for_object_key, parse_object_key
+from src.filetree_metadata import (
+    create_metadata_model_for_object_key,
+    extract_file_tree_metadata,
+)
 
 
 @pytest.mark.parametrize(
@@ -14,10 +19,8 @@ from src.parse_object_key import create_metadata_model_for_object_key, parse_obj
     ],
 )
 def test_object_key_valid(object_key_str: str) -> None:
-    # Given
-
     # When
-    object_key = parse_object_key(object_key_str)
+    object_key = ObjectKey(object_key=object_key_str)
 
     # Then
     assert object_key.object_key == object_key_str
@@ -45,11 +48,9 @@ def test_object_key_valid(object_key_str: str) -> None:
     ],
 )
 def test_object_key_invalid(object_key_str: str, expected_err_msg: str) -> None:
-    # Given
-
     # When
     with pytest.raises(ValidationError) as err:
-        _ = parse_object_key(object_key_str)
+        _ = ObjectKey(object_key=object_key_str)
 
     # Then
     assert any(expected_err_msg in error["msg"] for error in err.value.errors())
@@ -113,4 +114,84 @@ def test_object_key_invalid_metadata(object_key_str: str) -> None:
         "Invalid object key. The same sample id must be present at the beginning and in the middle"
         in error["msg"]
         for error in err.value.errors()
+    )
+
+
+def test_extract_filetree_metadata(
+    filetree_input_json: str, filetree_expected_output_json: str
+) -> None:
+    pass
+    # Given
+    input_object_keys = json.loads(filetree_input_json)
+    expected_output_metadata = json.loads(filetree_expected_output_json)
+
+    # When
+    output_metadata = extract_file_tree_metadata(input_object_keys)
+
+    # Then
+
+    assert expected_output_metadata == output_metadata
+
+
+@pytest.fixture
+def filetree_input_json() -> str:
+    return json.dumps(
+        [
+            "X123-Tp2/wgs/HWYLNDSXX_DNA_X123-Tp2_GAAGGAAG-ATGACGTC_L003_R1_001.fastq.gz",
+            "X123-Tp2/wgs/HWYLNDSXX_DNA_X123-Tp2_GAAGGAAG-ATGACGTC_L004_R1_001.fastq.gz",
+            "X121-Tn16/wgs/HYKKLDSXX_DNA_X121-Tn16_GTTGTTCG-GAAGTTGG_L001_R1_001.fastq.gz",
+            "X121-Tn16/wgs/HYKKLDSXX_DNA_X121-Tn16_GTTGTTCG-GAAGTTGG_L002_R1_001.fastq.gz",
+        ]
+    )
+
+
+@pytest.fixture
+def filetree_expected_output_json() -> str:
+    return json.dumps(
+        [
+            {
+                "case-id": "X123",
+                "sample-label": "Tp2",
+                "sample-id": "X123-Tp2",
+                "data-type": "wgs",
+                "lanes": [
+                    {
+                        "path": "X123-Tp2/wgs/HWYLNDSXX_DNA_X123-Tp2_GAAGGAAG-ATGACGTC_L003_R1_001.fastq.gz",
+                        "lane": 3,
+                        "marker-forward": "GAAGGAAG",
+                        "marker-reverse": "ATGACGTC",
+                        "barcode": "HWYLNDSXX",
+                    },
+                    {
+                        "path": "X123-Tp2/wgs/HWYLNDSXX_DNA_X123-Tp2_GAAGGAAG-ATGACGTC_L004_R1_001.fastq.gz",
+                        "lane": 4,
+                        "marker-forward": "GAAGGAAG",
+                        "marker-reverse": "ATGACGTC",
+                        "barcode": "HWYLNDSXX",
+                    },
+                ],
+            },
+            {
+                "case-id": "X121",
+                "sample-label": "Tn16",
+                "sample-id": "X121-Tn16",
+                "data-type": "wgs",
+                "lanes": [
+                    {
+                        "path": "X121-Tn16/wgs/HYKKLDSXX_DNA_X121-Tn16_GTTGTTCG-GAAGTTGG_L001_R1_001.fastq.gz",
+                        "lane": 2,
+                        "marker-forward": "GTTGTTCG",
+                        "marker-reverse": "GAAGTTGG",
+                        "barcode": "HYKKLDSXX",
+                    },
+                    {
+                        "path": "X121-Tn16/wgs/HYKKLDSXX_DNA_X121-Tn16_GTTGTTCG-GAAGTTGG_L001_R1_001.fastq.gz",
+                        "lane": 1,
+                        "marker-forward": "GTTGTTCG",
+                        "marker-reverse": "GAAGTTGG",
+                        "barcode": "HYKKLDSXX",
+                    },
+                ],
+            },
+        ]
     )
