@@ -8,17 +8,19 @@ from indi.filetree_metadata import ExtractFileTreeMetadata
 
 
 @click.command()
-@click.option("--input-file", type=str, help="Filename for input json", required=True)
-@click.option("--output-file", type=str, help="Filename for output json", required=True)
+@click.option(
+    "--input-file",
+    type=click.Path(exists=True),
+    help="Filename for input json",
+    required=True,
+)
+@click.option(
+    "--output-file",
+    type=click.Path(exists=True),
+    help="Filename for output json",
+    required=True,
+)
 def main(input_file: str, output_file: str) -> None:
-    if not Path(input_file).exists():
-        raise ValueError("Input file does not exist.")
-
-    if not Path(output_file).parent.exists():
-        raise ValueError(
-            "Directory for output file does not exist. Create one or input location where directory exists"
-        )
-
     logger.info("Create ExtractFileTreeMetadata instance.")
     filetree_metadata_extractor = ExtractFileTreeMetadata()
 
