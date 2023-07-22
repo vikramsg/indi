@@ -1,10 +1,21 @@
 import json
 from pathlib import Path
+from typing import Any
 
 import click
 from loguru import logger
 
 from indi.filetree_metadata import ExtractFileTreeMetadata
+
+
+def _validate_parent_dir_exists(ctx: Any, param: Any, value: str):
+    output_file_path = Path(value)
+    if not output_file_path.parent.exists():
+        raise click.BadParameter(
+            f"Parent directory of {value} does not exist."
+            "Create one or input a location which already has an existing parent directory."
+        )
+    return value
 
 
 @click.command()
@@ -16,7 +27,8 @@ from indi.filetree_metadata import ExtractFileTreeMetadata
 )
 @click.option(
     "--output-file",
-    type=click.Path(exists=True),
+    type=click.Path(),
+    callback=_validate_parent_dir_exists,
     help="Filename for output json",
     required=True,
 )
