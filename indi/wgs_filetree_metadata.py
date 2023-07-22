@@ -3,23 +3,23 @@ from typing import Any, Dict, List, Optional
 from loguru import logger
 from pydantic import ValidationError
 
-from indi.model import FileTreeMetadata, Metadata, ObjectKey
+from indi.model import WGSFileTreeMetadata, WGSMetadata, WGSObjectKey
 
 
-class ExtractFileTreeMetadata:
+class ExtractWGSFileTreeMetadata:
     def __init__(self) -> None:
-        self.object_keys: List[ObjectKey] = []
+        self.object_keys: List[WGSObjectKey] = []
 
-        self.sample_id_to_metadata: Dict[str, Metadata] = {}
+        self.sample_id_to_metadata: Dict[str, WGSMetadata] = {}
 
     def read_json(self, object_keys: Any) -> None:
         if len(object_keys) == 0:
             raise ValueError("Empty list")
 
         for object_key in object_keys:
-            self.object_keys.append(ObjectKey(object_key=object_key))
+            self.object_keys.append(WGSObjectKey(object_key=object_key))
 
-    def _unique_object_keys(self) -> List[ObjectKey]:
+    def _unique_object_keys(self) -> List[WGSObjectKey]:
         unique_object_keys = []
         object_key_dict: Dict[str, int] = {}
         for it, object_key in enumerate(self.object_keys):
@@ -35,16 +35,16 @@ class ExtractFileTreeMetadata:
 
         return unique_object_keys
 
-    def _parse_object_key(self, object_key: ObjectKey) -> Optional[Metadata]:
+    def _parse_object_key(self, object_key: WGSObjectKey) -> Optional[WGSMetadata]:
         try:
-            return Metadata.parse_object_key(object_key)
+            return WGSMetadata.parse_object_key(object_key)
         except ValidationError as err:
             logger.error(
                 f"Error for object key: {object_key}. Error: {err}.\nSkipping."
             )
             return None
 
-    def extract_filetree_metadata(self) -> None:
+    def extract_wgs_filetree_metadata(self) -> None:
         object_keys = self._unique_object_keys()
         for object_key in object_keys:
             object_key_metadata = self._parse_object_key(object_key)
@@ -59,7 +59,7 @@ class ExtractFileTreeMetadata:
                     object_key_metadata.lanes
                 )
 
-    def get_filetree_metadata(self) -> Any:
-        return FileTreeMetadata(
+    def get_wgs_filetree_metadata(self) -> Any:
+        return WGSFileTreeMetadata(
             filetree_metadata=list(self.sample_id_to_metadata.values())
         ).model_dump(by_alias=True)["filetree_metadata"]

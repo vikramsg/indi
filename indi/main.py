@@ -5,7 +5,7 @@ from typing import Any
 import click
 from loguru import logger
 
-from indi.filetree_metadata import ExtractFileTreeMetadata
+from indi.wgs_filetree_metadata import ExtractWGSFileTreeMetadata
 
 
 def _validate_parent_dir_exists(ctx: Any, param: Any, value: str) -> str:
@@ -34,17 +34,17 @@ def _validate_parent_dir_exists(ctx: Any, param: Any, value: str) -> str:
 )
 def main(input_file: str, output_file: str) -> None:
     logger.info("Create ExtractFileTreeMetadata instance.")
-    filetree_metadata_extractor = ExtractFileTreeMetadata()
+    filetree_metadata_extractor = ExtractWGSFileTreeMetadata()
 
     logger.info("Read input json file.")
     with open(input_file) as op:
         filetree_metadata_extractor.read_json(json.load(op))
 
     logger.info("Extract metadata from object keys.")
-    filetree_metadata_extractor.extract_filetree_metadata()
+    filetree_metadata_extractor.extract_wgs_filetree_metadata()
 
     logger.info("Get Filetree Metadata.")
-    output_metadata = filetree_metadata_extractor.get_filetree_metadata()
+    output_metadata = filetree_metadata_extractor.get_wgs_filetree_metadata()
 
     logger.info("Write Filetree Metadata to output file.")
     with open(output_file, "w") as fp:

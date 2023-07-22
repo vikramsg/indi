@@ -3,7 +3,7 @@ from typing import List
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 
-class ObjectKey(BaseModel):
+class WGSObjectKey(BaseModel):
     object_key: str
 
     @field_validator("object_key")
@@ -34,7 +34,7 @@ class Lane(BaseModel):
     barcode: str
 
 
-class Metadata(BaseModel):
+class WGSMetadata(BaseModel):
     case_id: str = Field(serialization_alias="case-id")
     sample_label: str = Field(serialization_alias="sample-label")
     sample_id: str = Field(serialization_alias="sample-id")
@@ -42,7 +42,7 @@ class Metadata(BaseModel):
     lanes: List[Lane]
 
     @classmethod
-    def parse_object_key(cls, object_key: ObjectKey) -> "Metadata":
+    def parse_object_key(cls, object_key: WGSObjectKey) -> "WGSMetadata":
         object_key_str = object_key.object_key
         slash_split_parts = object_key_str.split("/")
         case_id, sample_label = slash_split_parts[0].split("-")
@@ -72,7 +72,7 @@ class Metadata(BaseModel):
         )
 
     @model_validator(mode="after")
-    def validate_path_matches_sample_id(self) -> "Metadata":
+    def validate_path_matches_sample_id(self) -> "WGSMetadata":
         if self.sample_id != self.lanes[0].path.split("/")[2].split("_")[2]:
             raise ValueError(
                 """Invalid object key. The same sample id must be present at the beginning and in the middle,
@@ -82,5 +82,5 @@ class Metadata(BaseModel):
         return self
 
 
-class FileTreeMetadata(BaseModel):
-    filetree_metadata: List[Metadata]
+class WGSFileTreeMetadata(BaseModel):
+    filetree_metadata: List[WGSMetadata]

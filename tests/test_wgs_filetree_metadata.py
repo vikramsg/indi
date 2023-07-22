@@ -3,8 +3,8 @@ import json
 import pytest
 from pydantic import ValidationError
 
-from indi.filetree_metadata import ExtractFileTreeMetadata
-from indi.model import Lane, Metadata, ObjectKey
+from indi.wgs_filetree_metadata import ExtractWGSFileTreeMetadata
+from indi.model import Lane, WGSMetadata, WGSObjectKey
 
 
 @pytest.mark.parametrize(
@@ -17,7 +17,7 @@ from indi.model import Lane, Metadata, ObjectKey
 )
 def test_object_key_valid(object_key_str: str) -> None:
     # When
-    object_key = ObjectKey(object_key=object_key_str)
+    object_key = WGSObjectKey(object_key=object_key_str)
 
     # Then
     assert object_key.object_key == object_key_str
@@ -47,7 +47,7 @@ def test_object_key_valid(object_key_str: str) -> None:
 def test_object_key_invalid(object_key_str: str, expected_err_msg: str) -> None:
     # When
     with pytest.raises(ValidationError) as err:
-        _ = ObjectKey(object_key=object_key_str)
+        _ = WGSObjectKey(object_key=object_key_str)
 
     # Then
     assert any(expected_err_msg in error["msg"] for error in err.value.errors())
@@ -58,7 +58,7 @@ def test_object_key_invalid(object_key_str: str, expected_err_msg: str) -> None:
     [
         (
             "X123-Tn13/wgs/XXBRCDXXX_DNA_X123-Tn13_GAAGGAAG-ATGACGTC_L001_R1_001.fastq.gz",
-            Metadata(
+            WGSMetadata(
                 case_id="X123",
                 sample_label="Tn13",
                 sample_id="X123-Tn13",
@@ -77,13 +77,13 @@ def test_object_key_invalid(object_key_str: str, expected_err_msg: str) -> None:
     ],
 )
 def test_object_key_valid_metadata(
-    object_key_str: str, expected_metadata_model: Metadata
+    object_key_str: str, expected_metadata_model: WGSMetadata
 ) -> None:
     # Given
-    object_key = ObjectKey(object_key=object_key_str)
+    object_key = WGSObjectKey(object_key=object_key_str)
 
     # When
-    object_key_metadata = Metadata.parse_object_key(object_key)
+    object_key_metadata = WGSMetadata.parse_object_key(object_key)
 
     # Then
     assert object_key_metadata == expected_metadata_model
@@ -100,11 +100,11 @@ def test_object_key_valid_metadata(
 )
 def test_object_key_invalid_metadata(object_key_str: str) -> None:
     # Given
-    object_key = ObjectKey(object_key=object_key_str)
+    object_key = WGSObjectKey(object_key=object_key_str)
 
     # When
     with pytest.raises(ValidationError) as err:
-        _ = Metadata.parse_object_key(object_key)
+        _ = WGSMetadata.parse_object_key(object_key)
 
     # Then
     assert any(
@@ -121,12 +121,12 @@ def test_extract_filetree_metadata_with_valid_keys_only(
     input_object_keys = json.loads(filetree_input_json)
     expected_output_metadata = json.loads(filetree_expected_output_json)
 
-    metadata_extractor = ExtractFileTreeMetadata()
+    metadata_extractor = ExtractWGSFileTreeMetadata()
     metadata_extractor.read_json(input_object_keys)
 
     # When
-    metadata_extractor.extract_filetree_metadata()
-    output_metadata = metadata_extractor.get_filetree_metadata()
+    metadata_extractor.extract_wgs_filetree_metadata()
+    output_metadata = metadata_extractor.get_wgs_filetree_metadata()
 
     # Then
     assert expected_output_metadata == output_metadata
@@ -139,12 +139,12 @@ def test_extract_filetree_metadata_with_invalid_keys(
     input_object_keys = json.loads(filetree_input_json_with_invalid_keys)
     expected_output_metadata = json.loads(filetree_expected_output_json)
 
-    metadata_extractor = ExtractFileTreeMetadata()
+    metadata_extractor = ExtractWGSFileTreeMetadata()
     metadata_extractor.read_json(input_object_keys)
 
     # When
-    metadata_extractor.extract_filetree_metadata()
-    output_metadata = metadata_extractor.get_filetree_metadata()
+    metadata_extractor.extract_wgs_filetree_metadata()
+    output_metadata = metadata_extractor.get_wgs_filetree_metadata()
 
     # Then
     assert expected_output_metadata == output_metadata
@@ -161,12 +161,12 @@ def test_extract_filetree_metadata_from_identical_keys() -> None:
         )
     )
 
-    metadata_extractor = ExtractFileTreeMetadata()
+    metadata_extractor = ExtractWGSFileTreeMetadata()
     metadata_extractor.read_json(input_object_keys)
 
     # When
-    metadata_extractor.extract_filetree_metadata()
-    output_metadata = metadata_extractor.get_filetree_metadata()
+    metadata_extractor.extract_wgs_filetree_metadata()
+    output_metadata = metadata_extractor.get_wgs_filetree_metadata()
 
     # Then
     assert output_metadata == [
