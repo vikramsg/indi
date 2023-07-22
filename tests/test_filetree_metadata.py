@@ -114,11 +114,29 @@ def test_object_key_invalid_metadata(object_key_str: str) -> None:
     )
 
 
-def test_extract_filetree_metadata(
+def test_extract_filetree_metadata_with_valid_keys_only(
     filetree_input_json: str, filetree_expected_output_json: str
 ) -> None:
     # Given
     input_object_keys = json.loads(filetree_input_json)
+    expected_output_metadata = json.loads(filetree_expected_output_json)
+
+    metadata_extractor = ExtractFileTreeMetadata()
+    metadata_extractor.read_json(input_object_keys)
+
+    # When
+    metadata_extractor.extract_filetree_metadata()
+    output_metadata = metadata_extractor.get_filetree_metadata()
+
+    # Then
+    assert expected_output_metadata == output_metadata
+
+
+def test_extract_filetree_metadata_with_invalid_keys(
+    filetree_input_json_with_invalid_keys: str, filetree_expected_output_json: str
+) -> None:
+    # Given
+    input_object_keys = json.loads(filetree_input_json_with_invalid_keys)
     expected_output_metadata = json.loads(filetree_expected_output_json)
 
     metadata_extractor = ExtractFileTreeMetadata()
@@ -178,6 +196,20 @@ def filetree_input_json() -> str:
             "X123-Tp2/wgs/HWYLNDSXX_DNA_X123-Tp2_GAAGGAAG-ATGACGTC_L004_R1_001.fastq.gz",
             "X121-Tn16/wgs/HYKKLDSXX_DNA_X121-Tn16_GTTGTTCG-GAAGTTGG_L001_R1_001.fastq.gz",
             "X121-Tn16/wgs/HYKKLDSXX_DNA_X121-Tn16_GTTGTTCG-GAAGTTGG_L002_R1_001.fastq.gz",
+        ]
+    )
+
+
+@pytest.fixture
+def filetree_input_json_with_invalid_keys() -> str:
+    return json.dumps(
+        [
+            "X123-Tp2/wgs/HWYLNDSXX_DNA_X123-Tp2_GAAGGAAG-ATGACGTC_L003_R1_001.fastq.gz",
+            "X123-Tp2/wgs/HWYLNDSXX_DNA_X123-Tp2_GAAGGAAG-ATGACGTC_L004_R1_001.fastq.gz",
+            "X123-Tp2/wgs/HWYLNDSXX_DNA_X123-Tp1_GAAGGAAG-ATGACGTC_L004_R1_001.fastq.gz",
+            "X121-Tn16/wgs/HYKKLDSXX_DNA_X121-Tn16_GTTGTTCG-GAAGTTGG_L001_R1_001.fastq.gz",
+            "X121-Tn16/wgs/HYKKLDSXX_DNA_X121-Tn16_GTTGTTCG-GAAGTTGG_L002_R1_001.fastq.gz",
+            "X121-Tn16/wgs/HYKKLDSXX_DNA_X123-Tn16_GTTGTTCG-GAAGTTGG_L002_R1_001.fastq.gz",
         ]
     )
 
