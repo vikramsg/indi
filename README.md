@@ -31,7 +31,24 @@ Invoke static checks using
 make check
 ```
 
+The project uses `pytest` for unit testing. Run all tests using
+
+```
+make test
+```
 
 
 ## Run
+
+Once the package is installed, it is available as a CLI utility `wgs_filetree_metadata`.
+All options for the utility can be obtained by invoking `wgs_filetree_metadata --help`.
+There is a sample file available, sourced from 
+[GitHub](https://raw.githubusercontent.com/indivumed/application-exercises/master/filetree-sample-data.json)
+at the path `data/filetree-sample-data.json`.
+
+An example way to run it would be the following 
+
+```
+wgs_filetree_metadata --input-file data/filetree-sample-data.json --output-file data/filetree_metadata.json 
+```
 

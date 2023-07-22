@@ -3,8 +3,8 @@ import json
 import pytest
 from pydantic import ValidationError
 
-from indi.wgs_filetree_metadata import ExtractWGSFileTreeMetadata
 from indi.model import Lane, WGSMetadata, WGSObjectKey
+from indi.wgs_filetree_metadata import ExtractWGSFileTreeMetadata
 
 
 @pytest.mark.parametrize(
