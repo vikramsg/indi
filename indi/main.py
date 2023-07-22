@@ -8,7 +8,7 @@ from loguru import logger
 from indi.filetree_metadata import ExtractFileTreeMetadata
 
 
-def _validate_parent_dir_exists(ctx: Any, param: Any, value: str):
+def _validate_parent_dir_exists(ctx: Any, param: Any, value: str) -> str:
     output_file_path = Path(value)
     if not output_file_path.parent.exists():
         raise click.BadParameter(
@@ -46,7 +46,7 @@ def main(input_file: str, output_file: str) -> None:
     logger.info("Get Filetree Metadata.")
     output_metadata = filetree_metadata_extractor.get_filetree_metadata()
 
-    logger.info("Get Filetree Metadata.")
+    logger.info("Write Filetree Metadata to output file.")
     with open(output_file, "w") as fp:
         json.dump(output_metadata, fp)
 

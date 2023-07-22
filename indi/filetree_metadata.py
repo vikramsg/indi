@@ -1,5 +1,8 @@
 from typing import Any, Dict, List
 
+from loguru import logger
+from pydantic import ValidationError
+
 from indi.model import FileTreeMetadata, Metadata, ObjectKey
 
 
@@ -9,18 +12,30 @@ class ExtractFileTreeMetadata:
 
         self.sample_id_to_metadata: Dict[str, Metadata] = {}
 
-    def read_json(self, object_keys: Dict[str, Any]) -> None:
+    def read_json(self, object_keys: Any) -> None:
         if len(object_keys) == 0:
             raise ValueError("Empty list")
 
-        # Convert to ObjectKey which will do first level of validation
-        self.object_keys = [
-            ObjectKey(object_key=object_key) for object_key in object_keys
-        ]
+        unique_object_keys: Dict[str, int] = {}
+
+        for it, object_key in enumerate(object_keys):
+            if object_key in unique_object_keys.keys():
+                logger.error(
+                    f"Object key {object_key} found on line {it} already exists on line unique_object_keys[object_key]."
+                    "Skipping."
+                )
+            else:
+                unique_object_keys[object_key] = it
+                self.object_keys.append(ObjectKey(object_key=object_key))
 
     def extract_filetree_metadata(self) -> None:
         for object_key in self.object_keys:
-            object_key_metadata = Metadata.parse_object_key(object_key)
+            try:
+                object_key_metadata = Metadata.parse_object_key(object_key)
+            except ValidationError as err:
+                logger.error(
+                    f"Error for object key: {object_key}. Error: {err}. Skipping."
+                )
 
             sample_id = object_key_metadata.sample_id
             if sample_id not in self.sample_id_to_metadata:
