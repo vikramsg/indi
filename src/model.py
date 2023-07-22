@@ -1,34 +1,30 @@
-from typing import List
+from typing import Dict, List
 
-from pydantic import BaseModel, field_validator, model_validator
-
-
-def _snake_to_kebab(snake_str: str) -> str:
-    return snake_str.replace("_", "-")
-
-
-def _dict_encoder(snake_dict: dict) -> dict:
-    return {_snake_to_kebab(key): value for key, value in snake_dict.items()}
+from pydantic import (
+    BaseModel,
+    Field,
+    field_validator,
+    model_validator,
+)
 
 
 class Lane(BaseModel):
     path: str
     lane: int
-    marker_forward: str
-    marker_reverse: str
+    marker_forward: str = Field(serialization_alias="marker-forward")
+    marker_reverse: str = Field(serialization_alias="marker-reverse")
     barcode: str
 
 
 class Metadata(BaseModel):
-    case_id: str
-    sample_label: str
-    sample_id: str
-    data_type: str
+    case_id: str = Field(serialization_alias="case-id")
+    sample_label: str = Field(serialization_alias="sample-label")
+    sample_id: str = Field(serialization_alias="sample-id")
+    data_type: str = Field(serialization_alias="data-type")
     lanes: List[Lane]
 
     @classmethod
     def parse_object_key(cls, object_key: str) -> "Metadata":
-        # ToDo: Rename
         slash_split_parts = object_key.split("/")
         case_id, sample_label = slash_split_parts[0].split("-")
         data_type = slash_split_parts[1]
@@ -65,10 +61,6 @@ class Metadata(BaseModel):
             )
 
         return self
-
-    # JSON output will have kebab case
-    class Config:
-        json_encoders = {dict: _dict_encoder}
 
 
 class ObjectKey(BaseModel):
