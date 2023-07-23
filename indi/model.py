@@ -1,6 +1,6 @@
 from typing import List
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class WGSObjectKey(BaseModel):
@@ -22,6 +22,30 @@ class WGSObjectKey(BaseModel):
 
         if value.count("_") != 6:
             raise ValueError("Invalid object key. Must contain 6 _")
+
+        slash_split_parts = value.split("/")
+        case_id, sample_label = slash_split_parts[0].split("-")
+        sample_id = f"{case_id}-{sample_label}"
+        if sample_id != value.split("/")[2].split("_")[2]:
+            raise ValueError(
+                "Invalid object key. The same sample id must be present at the beginning and in the middle."
+                "\nThis is the format of the object key: "
+                "<{sample_id}/{data_type}/{barcode}_DNA_{sample_id}_.....fastq.gz>"
+            )
+
+        if value.split("/")[1] != "wgs":
+            raise ValueError(
+                "Invalid object key. Data type must be wgs."
+                "\nThis is the format of the object key: "
+                "<{sample_id}/wgs/{barcode}_{DNA}_{sample_id}_.....fastq.gz>"
+            )
+
+        if value.split("/")[2].split("_")[1] != "DNA":
+            raise ValueError(
+                "Invalid object key. Object key must have DNA at the second position in path."
+                "\nThis is the format of the object key: "
+                "<{sample_id}/{data_type}/{barcode}_DNA_{sample_id}_.....fastq.gz>"
+            )
 
         return value
 
@@ -73,16 +97,6 @@ class WGSMetadata(BaseModel):
                 )
             ],
         )
-
-    @model_validator(mode="after")
-    def validate_path_matches_sample_id(self) -> "WGSMetadata":
-        if self.sample_id != self.lanes[0].path.split("/")[2].split("_")[2]:
-            raise ValueError(
-                """Invalid object key. The same sample id must be present at the beginning and in the middle,
-                that is, the path must be <sample_id/data_type/..._sample_id_....>"""
-            )
-
-        return self
 
 
 class WGSFileTreeMetadata(BaseModel):

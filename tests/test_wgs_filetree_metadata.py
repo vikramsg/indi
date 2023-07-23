@@ -27,20 +27,32 @@ def test_object_key_valid(object_key_str: str) -> None:
     "object_key_str, expected_err_msg",
     [
         (
-            "X123-Tn13/wgs/XXBRCDXXX_DNA_X123-Ts13_GAAGGAAG-ATGACGTC_L001_R1_001",
+            "X123-Tn13/wgs/XXBRCDXXX_DNA_X123-Tn13_GAAGGAAG-ATGACGTC_L001_R1_001",
             "Invalid object key. Should end with .fastq.gz",
         ),
         (
-            "X123-Tn13wgs/XXBRCDXXX_DNA_X123-Ts13_GAAGGAAG-ATGACGTC_L001_R1_001.fastq.gz",
+            "X123-Tn13wgs/XXBRCDXXX_DNA_X123-Tn13_GAAGGAAG-ATGACGTC_L001_R1_001.fastq.gz",
             "Invalid object key. Must contain 2 /",
         ),
         (
-            "X123Tn13/wgs/XXBRCDXXX_DNA_X123-Ts13_GAAGGAAG-ATGACGTC_L001_R1_001.fastq.gz",
+            "X123Tn13/wgs/XXBRCDXXX_DNA_X123-Tn13_GAAGGAAG-ATGACGTC_L001_R1_001.fastq.gz",
             "Invalid object key. Must contain 3 -",
         ),
         (
-            "X123-Tn13/wgs/XXBRCDXXX_DNA_X123-Ts13GAAGGAAG-ATGACGTC_L001_R1_001.fastq.gz",
+            "X123-Tn13/wgs/XXBRCDXXX_DNA_X123-Tn13GAAGGAAG-ATGACGTC_L001_R1_001.fastq.gz",
             "Invalid object key. Must contain 6 _",
+        ),
+        (
+            "X123-Tn13/wg2/XXBRCDXXX_DNA_X123-Tn13_GAAGGAAG-ATGACGTC_L001_R1_001.fastq.gz",
+            "Invalid object key. Data type must be wgs.",
+        ),
+        (
+            "X123-Tn13/wgs/XXBRCDXXX_DNA_X123-Ts13_GAAGGAAG-ATGACGTC_L001_R1_001.fastq.gz",
+            "Invalid object key. The same sample id must be present at the beginning and in the middle.",
+        ),
+        (
+            "X123-Tn13/wgs/XXBRCDXXX_RNA_X123-Tn13_GAAGGAAG-ATGACGTC_L001_R1_001.fastq.gz",
+            "Invalid object key. Object key must have DNA at the second position in path.",
         ),
     ],
 )
@@ -87,31 +99,6 @@ def test_object_key_valid_metadata(
 
     # Then
     assert object_key_metadata == expected_metadata_model
-
-
-@pytest.mark.parametrize(
-    "object_key_str",
-    [
-        (
-            "X123-Tn12/wgs/XXBRCDXXX_DNA_X123-Tn13_GAAGGAAG-ATGACGTC_L001_R1_001.fastq.gz"
-        ),
-        ("X123-Tn13/wgs/XXBRCDXXX_DNA_X123-T13_GAAGGAAG-ATGACGTC_L001_R1_001.fastq.gz"),
-    ],
-)
-def test_object_key_invalid_metadata(object_key_str: str) -> None:
-    # Given
-    object_key = WGSObjectKey(object_key=object_key_str)
-
-    # When
-    with pytest.raises(ValidationError) as err:
-        _ = WGSMetadata.parse_object_key(object_key)
-
-    # Then
-    assert any(
-        "Invalid object key. The same sample id must be present at the beginning and in the middle"
-        in error["msg"]
-        for error in err.value.errors()
-    )
 
 
 def test_extract_filetree_metadata_with_valid_keys_only(

@@ -299,17 +299,17 @@
         "data-type": "wgs",
         "lanes": [
             {
-                "path": "Y512-Tc7/wgs/HWW7GDSXX_DNA_Y512-Tc7_TGAAGACG-TGGCATGT_L002_R1_001.fastq.gz",
-                "lane": 2,
-                "marker-forward": "TGAAGACG",
-                "marker-reverse": "TGGCATGT",
-                "barcode": "HWW7GDSXX"
-            },
-            {
                 "path": "Y512-Tc7/wgs/HWW7GDSXX_DNA_Y512-Tc7_TGAAGACG-TGGCATGA_L002_R1_001.fastq.gz",
                 "lane": 2,
                 "marker-forward": "TGAAGACG",
                 "marker-reverse": "TGGCATGA",
+                "barcode": "HWW7GDSXX"
+            },
+            {
+                "path": "Y512-Tc7/wgs/HWW7GDSXX_DNA_Y512-Tc7_TGAAGACG-TGGCATGT_L002_R1_001.fastq.gz",
+                "lane": 2,
+                "marker-forward": "TGAAGACG",
+                "marker-reverse": "TGGCATGT",
                 "barcode": "HWW7GDSXX"
             },
             {
@@ -408,13 +408,6 @@
             {
                 "path": "X550-Tc8/wgs/HWW7GDSXX_DNA_X550-Tc8_GAGCAGTA-ACAGCTCA_L002_R1_001.fastq.gz",
                 "lane": 2,
-                "marker-forward": "GAGCAGTA",
-                "marker-reverse": "ACAGCTCA",
-                "barcode": "HWW7GDSXX"
-            },
-            {
-                "path": "X550-Tc8/wgs/HWW7GDSXX_DN_X550-Tc8_GAGCAGTA-ACAGCTCA_L003_R1_001.fastq.gz",
-                "lane": 3,
                 "marker-forward": "GAGCAGTA",
                 "marker-reverse": "ACAGCTCA",
                 "barcode": "HWW7GDSXX"
