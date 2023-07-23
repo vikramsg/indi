@@ -64,6 +64,16 @@ To run, make sure Docker is running and then do the following.
 CMD="wgs_filetree_metadata --input-file data/filetree-sample-data.json data/filetree_metadata.json" docker-compose up
 ```
 
+## CI
+
+The package has a GitHub Action that does static checks
+and tests when we open a PR as well as when it is merged
+to main.
+
+```
+.github/workflows/wgs_filetree_metadata_ci.yaml
+```
+
 
 ## Extraction
 
@@ -76,6 +86,7 @@ Finally we sort lanes for each metadata.
 For object key, we do the following validations.
 If any of the validations fail, we log an error and skip processing
 that object key.
+We leverage PyDantic for validations.
 
 1. For the object keys, we validate that they always have the same number of
 `.`, `_`, `-` and `/`.
