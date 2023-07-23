@@ -36,7 +36,7 @@ def main(input_file: str, output_file: str) -> None:
     logger.info("Create ExtractFileTreeMetadata instance.")
     filetree_metadata_extractor = ExtractWGSFileTreeMetadata()
 
-    logger.info("Read input json file.")
+    logger.info(f"Read from input json file: {input_file}.")
     with open(input_file) as op:
         filetree_metadata_extractor.read_json(json.load(op))
 
@@ -46,7 +46,7 @@ def main(input_file: str, output_file: str) -> None:
     logger.info("Get Filetree Metadata.")
     output_metadata = filetree_metadata_extractor.get_wgs_filetree_metadata()
 
-    logger.info("Write Filetree Metadata to output file.")
+    logger.info(f"Write Filetree Metadata to output file: {output_file}.")
     with open(output_file, "w") as fp:
         json.dump(output_metadata, fp, indent=4)
 
