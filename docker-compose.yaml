@@ -1,0 +1,8 @@
+services:
+  wgs_filetree_metadata_extractor:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    command: ${CMD}
+    volumes:
+      - ./data:/app/data
