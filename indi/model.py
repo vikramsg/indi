@@ -23,30 +23,31 @@ class WGSObjectKey(BaseModel):
         if value.count("_") != 6:
             raise ValueError("Invalid object key. Must contain 6 _")
 
-        return value
-
-    @model_validator(mode="before")
-    def validate_path_matches_sample_id(cls, data: Dict[str, str]) -> "WGSObjectKey":
-        object_key = data["object_key"]
-
-        slash_split_parts = object_key.split("/")
+        slash_split_parts = value.split("/")
         case_id, sample_label = slash_split_parts[0].split("-")
         sample_id = f"{case_id}-{sample_label}"
-
-        if sample_id != object_key.split("/")[2].split("_")[2]:
+        if sample_id != value.split("/")[2].split("_")[2]:
             raise ValueError(
                 "Invalid object key. The same sample id must be present at the beginning and in the middle."
                 "\nThis is the format of the object key: "
-                "<{sample_id}/{data_type}/{barcode}_{DNA}_{sample_id}_.....fastq.gz>"
+                "<{sample_id}/{data_type}/{barcode}_DNA_{sample_id}_.....fastq.gz>"
             )
 
-        return data
+        if value.split("/")[1] != "wgs":
+            raise ValueError(
+                "Invalid object key. Data type must be wgs."
+                "\nThis is the format of the object key: "
+                "<{sample_id}/wgs/{barcode}_{DNA}_{sample_id}_.....fastq.gz>"
+            )
 
-    @model_validator(mode="before")
-    def validate_datatype_is_always_wgs(cls, data: Dict[str, str]) -> str:
-        if data["object_key"].split("/")[1] != "wgs":
-            raise ValueError("Data type must be wgs.")
-        return data
+        if value.split("/")[2].split("_")[1] != "DNA":
+            raise ValueError(
+                "Invalid object key. Object key must have DNA at the second position in path."
+                "\nThis is the format of the object key: "
+                "<{sample_id}/{data_type}/{barcode}_DNA_{sample_id}_.....fastq.gz>"
+            )
+
+        return value
 
 
 class Lane(BaseModel):
