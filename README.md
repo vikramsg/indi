@@ -50,7 +50,6 @@ An example way to run it would be the following
 
 ```
 wgs_filetree_metadata --input-file data/filetree-sample-data.json --output-file data/filetree_metadata.json 
-wgs_filetree_metadata --input-file data/small-filetree-sample.json --output-file data/small_filetree_metadata.json 
 ```
 
 
