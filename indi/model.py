@@ -1,6 +1,6 @@
-from typing import Dict, List
+from typing import List
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class WGSObjectKey(BaseModel):

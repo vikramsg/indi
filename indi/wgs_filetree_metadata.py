@@ -83,7 +83,7 @@ class ExtractWGSFileTreeMetadata:
             else:
                 sample_id_to_metadata[sample_id].lanes.extend(object_key_metadata.lanes)
 
-        return sample_id_to_metadata.values()
+        return list(sample_id_to_metadata.values())
 
     def _sort_metadata_lanes(
         self, sample_id_metadata: List[WGSMetadata]
@@ -138,5 +138,13 @@ class ExtractWGSFileTreeMetadata:
 
         Returns:
             Any: json for the metadata
+
+        Raises:
+            ValueError: Raise error if metadata is None
         """
-        return self.wgs_filetree_metadata.model_dump(by_alias=True)["filetree_metadata"]
+        if self.wgs_filetree_metadata is not None:
+            return self.wgs_filetree_metadata.model_dump(by_alias=True)[
+                "filetree_metadata"
+            ]
+        else:
+            raise ValueError("Filetree is None. Process it before getting data.")
