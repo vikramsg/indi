@@ -50,6 +50,7 @@ An example way to run it would be the following
 
 ```
 wgs_filetree_metadata --input-file data/filetree-sample-data.json --output-file data/filetree_metadata.json 
+wgs_filetree_metadata --input-file data/small-filetree-sample.json --output-file data/small_filetree_metadata.json 
 ```
 
 
@@ -62,3 +63,23 @@ To run, make sure Docker is running and then do the following.
 ```
 CMD="wgs_filetree_metadata --input-file data/filetree-sample-data.json data/filetree_metadata.json" docker-compose up
 ```
+
+
+## Extraction
+
+We loop through the object keys, validate them then convert each
+object key to a Metadata object. Then we combine the metadata objects
+ensuring each sample id has only 1 Metadata object. 
+Finally we sort lanes for each metadata.
+
+
+For object key, we do the following validations.
+If any of the validations fail, we log an error and skip processing
+that object key.
+
+1. For the object keys, we validate that they always have the same number of
+`.`, `_`, `-` and `/`.
+2. We validate that they end with `fastq.gz`.
+3. We validate that `sample_id` is the same at the 2 positions they occur. 
+4. We validate that the `data-type` is always `wgs`.
+5. We validate that `DNA` is always present at the same place in the key.
