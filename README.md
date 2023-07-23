@@ -55,9 +55,9 @@ wgs_filetree_metadata --input-file data/filetree-sample-data.json --output-file 
 
 ## Run using Docker
 
-The package also includes the capability to use Docker to run the tool for easy reproducibility. 
-To run, make sure Docker is running and then do the following.  
-The command has to be present as an environment variable CMD. 
+The package also includes the capability to use Docker to run the tool for easy reproducibility.
+The command has to be present as an environment variable CMD.
+To run, make sure Docker is running and then do the following.
 
 ```
 CMD="wgs_filetree_metadata --input-file data/filetree-sample-data.json data/filetree_metadata.json" docker-compose up
