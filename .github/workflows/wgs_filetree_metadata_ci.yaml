@@ -28,13 +28,10 @@ jobs:
           export PATH="$HOME/.poetry/bin:$PATH"
 
       - name: Install project dependencies
-        working-directory: python/batch 
         run: poetry install
 
       - name: Static checks 
-        working-directory: python/batch 
         run: poetry run ./static_checks.sh 
 
       - name: Run pytest
-        working-directory: python/batch 
         run: poetry run pytest
