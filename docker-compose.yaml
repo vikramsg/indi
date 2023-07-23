@@ -1,0 +1,8 @@
+services:
+  wgs_filetree_metadata_extractor:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    command: wgs_filetree_metadata --input-file data/filetree-sample-data.json --output-file data/filetree_metadata.json
+    volumes:
+      - ./data:/app/data
