@@ -24,11 +24,16 @@ class ExtractWGSFileTreeMetadata:
         Raises:
             ValueError: Raise error if the input is empty
         """
-        if len(object_keys) == 0:
+        if not object_keys:
             raise ValueError("Empty list")
 
         for object_key in object_keys:
-            self.object_keys.append(WGSObjectKey(object_key=object_key))
+            try:
+                self.object_keys.append(WGSObjectKey(object_key=object_key))
+            except ValidationError as err:
+                logger.error(
+                    f"""Error for object key: {object_key}.\nError: {err.errors()[0]["msg"]}\nSkipping."""
+                )
 
     def _unique_object_keys(self) -> List[WGSObjectKey]:
         unique_object_keys = []
@@ -53,7 +58,7 @@ class ExtractWGSFileTreeMetadata:
             return WGSMetadata.parse_object_key(object_key)
         except ValidationError as err:
             logger.error(
-                f"Error for object key: {object_key}. Error: {err}.\nSkipping."
+                f"""Error for object key: {object_key}.\nError: {err.errors()[0]["msg"]}\nSkipping."""
             )
             return None
 
@@ -69,7 +74,7 @@ class ExtractWGSFileTreeMetadata:
 
         for object_key in object_keys:
             object_key_metadata = self._object_key_to_metadata(object_key)
-            if not object_key_metadata:
+            if object_key_metadata is None:
                 continue
 
             sample_id = object_key_metadata.sample_id

@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -24,6 +24,29 @@ class WGSObjectKey(BaseModel):
             raise ValueError("Invalid object key. Must contain 6 _")
 
         return value
+
+    @model_validator(mode="before")
+    def validate_path_matches_sample_id(cls, data: Dict[str, str]) -> "WGSObjectKey":
+        object_key = data["object_key"]
+
+        slash_split_parts = object_key.split("/")
+        case_id, sample_label = slash_split_parts[0].split("-")
+        sample_id = f"{case_id}-{sample_label}"
+
+        if sample_id != object_key.split("/")[2].split("_")[2]:
+            raise ValueError(
+                "Invalid object key. The same sample id must be present at the beginning and in the middle."
+                "\nThis is the format of the object key: "
+                "<{sample_id}/{data_type}/{barcode}_{DNA}_{sample_id}_.....fastq.gz>"
+            )
+
+        return data
+
+    @model_validator(mode="before")
+    def validate_datatype_is_always_wgs(cls, data: Dict[str, str]) -> str:
+        if data["object_key"].split("/")[1] != "wgs":
+            raise ValueError("Data type must be wgs.")
+        return data
 
 
 class Lane(BaseModel):
@@ -73,16 +96,6 @@ class WGSMetadata(BaseModel):
                 )
             ],
         )
-
-    @model_validator(mode="after")
-    def validate_path_matches_sample_id(self) -> "WGSMetadata":
-        if self.sample_id != self.lanes[0].path.split("/")[2].split("_")[2]:
-            raise ValueError(
-                """Invalid object key. The same sample id must be present at the beginning and in the middle,
-                that is, the path must be <sample_id/data_type/..._sample_id_....>"""
-            )
-
-        return self
 
 
 class WGSFileTreeMetadata(BaseModel):
