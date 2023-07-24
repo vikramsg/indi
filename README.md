@@ -10,7 +10,7 @@ curl -sSL https://install.python-poetry.org | python3 - --version 1.4.2
 
 and then add `$HOME/.local/bin` to the Path. 
 ```
-export PATH="$HOME/.poetry/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 ```
 
 Check for installation using `poetry --version` and make sure it shows `1.4.2`.
